@@ -1,4 +1,6 @@
-package v000;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GestorCSV {
     private String[][] datos;
     private String[] cabeceras;
@@ -18,7 +20,7 @@ public class GestorCSV {
 
     public void cargarDatos(String[] cabeceras, String[][] datosEntrada) {
         this.cabeceras = cabeceras;
-        
+
         filas = datosEntrada.length;
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -29,13 +31,17 @@ public class GestorCSV {
     }
 
     public void crearIndice(String nombreColumna) {
+        crearIndice(nombreColumna, new QuickSort());
+    }
+
+    public void crearIndice(String nombreColumna, AlgoritmoOrdenacion algoritmo) {
         int indiceColumna = obtenerIndiceColumna(nombreColumna);
         if (indiceColumna == -1) {
             System.out.println("Columna no encontrada: " + nombreColumna);
             return;
         }
 
-        indices[indiceColumna] = new Indice(filas);
+        indices[indiceColumna] = new Indice(filas, algoritmo);
         columnaIndexada[indiceColumna] = true;
 
         for (int i = 0; i < filas; i++) {
@@ -43,6 +49,43 @@ public class GestorCSV {
         }
 
         System.out.println("> Índice creado para la columna: " + nombreColumna);
+    }
+
+    public void crearIndiceOrdenado(String nombreColumna, boolean descendente, String algoritmoNombre) {
+        int indiceColumna = obtenerIndiceColumna(nombreColumna);
+        if (indiceColumna == -1) {
+            System.out.println("Columna no encontrada: " + nombreColumna);
+            return;
+        }
+
+        indices[indiceColumna] = null;
+        columnaIndexada[indiceColumna] = false;
+
+        AlgoritmoOrdenacion algoritmo = obtenerAlgoritmoOrdenacion(algoritmoNombre);
+        indices[indiceColumna] = new IndiceOrdenado(filas, algoritmo, descendente);
+        columnaIndexada[indiceColumna] = true;
+
+        for (int i = 0; i < filas; i++) {
+            String valor = datos[i][indiceColumna];
+            if (valor != null) {
+                indices[indiceColumna].agregar(valor, i);
+            }
+        }
+
+        System.out.println("Índice ordenado creado exitosamente para: " + nombreColumna);
+    }
+
+    private AlgoritmoOrdenacion obtenerAlgoritmoOrdenacion(String nombre) {
+        switch (nombre.toLowerCase()) {
+            case "quicksort":
+                return new QuickSort();
+            case "mergesort":
+                return new MergeSort();
+            case "heapsort":
+                return new HeapSort();
+            default:
+                return new QuickSort();
+        }
     }
 
     public String[][] buscarPorIndice(String nombreColumna, String valor) {
@@ -53,14 +96,27 @@ public class GestorCSV {
         }
 
         int[] posiciones = indices[indiceColumna].buscar(valor);
-        
+
+        if (posiciones.length == 0) {
+            List<Integer> matches = new ArrayList<>();
+            for (int i = 0; i < filas; i++) {
+                if (datos[i][indiceColumna].equals(valor)) {
+                    matches.add(i);
+                }
+            }
+            posiciones = matches.stream().mapToInt(i -> i).toArray();
+        }
+
+        return obtenerFilasPorPosiciones(posiciones);
+    }
+
+    private String[][] obtenerFilasPorPosiciones(int[] posiciones) {
         String[][] resultado = new String[posiciones.length][columnas];
         for (int i = 0; i < posiciones.length; i++) {
             for (int j = 0; j < columnas; j++) {
                 resultado[i][j] = datos[posiciones[i]][j];
             }
         }
-
         return resultado;
     }
 
@@ -81,29 +137,47 @@ public class GestorCSV {
         return columnaIndexada[indiceColumna];
     }
 
+    public Indice obtenerIndice(String nombreColumna) {
+        int indiceColumna = obtenerIndiceColumna(nombreColumna);
+        if (indiceColumna == -1 || !columnaIndexada[indiceColumna]) {
+            return null;
+        }
+        return indices[indiceColumna];
+    }
+
     public String[] obtenerValoresUnicos(String nombreColumna) {
         int indiceColumna = obtenerIndiceColumna(nombreColumna);
         if (indiceColumna == -1 || !columnaIndexada[indiceColumna]) {
             System.out.println("La columna no está indexada: " + nombreColumna);
             return new String[0];
         }
-        
+
         return indices[indiceColumna].obtenerTodos();
     }
 
-    public void imprimirDatos() {      
+    public void imprimirDatos() {
         for (int i = 0; i < cabeceras.length; i++) {
             System.out.printf("%-25.20s", cabeceras[i]);
         }
         System.out.println();
         System.out.println("=".repeat(60));
-
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                 System.out.printf("%-25.20s", datos[i][j]);
+                System.out.printf("%-25.20s", datos[i][j]);
             }
             System.out.println();
         }
         System.out.println("=".repeat(60));
+    }
+
+    public int getColumnas() {
+        return columnas;
+    }
+
+    public String getDato(int fila, int columna) {
+        if (fila >= 0 && fila < filas && columna >= 0 && columna < columnas) {
+            return datos[fila][columna];
+        }
+        return null;
     }
 }
