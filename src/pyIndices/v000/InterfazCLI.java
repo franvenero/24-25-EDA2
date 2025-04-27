@@ -152,28 +152,37 @@ public class InterfazCLI {
     private void buscarPorRango() {
         System.out.print("Ingrese el nombre de la columna ordenada: ");
         String columna = scanner.nextLine();
-
+    
         if (!gestor.estaIndexada(columna)) {
-            System.out.println("La columna no está indexada o no está ordenada");
+            System.out.println("Error: La columna no está indexada o no es un índice ordenado");
             return;
         }
-
+    
+        Indice indice = gestor.obtenerIndice(columna);
+        if (!(indice instanceof IndiceOrdenado)) {
+            System.out.println("Error: La columna no tiene un índice ordenado");
+            return;
+        }
+    
         System.out.print("Valor inicial del rango: ");
-        String valorInicial = scanner.nextLine();
-
+        String valorInicial = scanner.nextLine().trim();
+    
         System.out.print("Valor final del rango: ");
-        String valorFinal = scanner.nextLine();
-
-        IndiceOrdenado indice = (IndiceOrdenado) gestor.obtenerIndice(columna);
-        BuscadorBinario buscador = new BuscadorBinario(indice);
+        String valorFinal = scanner.nextLine().trim();
+    
+        BuscadorBinario buscador = new BuscadorBinario((IndiceOrdenado) indice);
         int[] posiciones = buscador.buscarRango(valorInicial, valorFinal);
-
-        System.out.println("\nResultados encontrados: " + posiciones.length);
-        for (int pos : posiciones) {
-            for (int j = 0; j < gestor.getColumnas(); j++) {
-                System.out.print(gestor.getDato(pos, j) + "\t");
+    
+        if (posiciones.length == 0) {
+            System.out.println("\nNo se encontraron resultados en el rango especificado.");
+        } else {
+            System.out.println("\nResultados encontrados (" + posiciones.length + "):");
+            for (int pos : posiciones) {
+                for (int j = 0; j < gestor.getColumnas(); j++) {
+                    System.out.print(gestor.getDato(pos, j) + "\t");
+                }
+                System.out.println();
             }
-            System.out.println();
         }
     }
 

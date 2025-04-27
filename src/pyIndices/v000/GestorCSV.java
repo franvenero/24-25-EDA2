@@ -58,21 +58,28 @@ public class GestorCSV {
             return;
         }
 
-        indices[indiceColumna] = null;
-        columnaIndexada[indiceColumna] = false;
-
         AlgoritmoOrdenacion algoritmo = obtenerAlgoritmoOrdenacion(algoritmoNombre);
-        indices[indiceColumna] = new IndiceOrdenado(filas, algoritmo, descendente);
+        IndiceOrdenado indice = new IndiceOrdenado(filas, algoritmo, descendente);
+
+        boolean esNumerico = true;
+        try {
+            for (int i = 0; i < filas; i++) {
+                Integer.parseInt(datos[i][indiceColumna]);
+            }
+        } catch (NumberFormatException e) {
+            esNumerico = false;
+        }
+        indice.setEsNumerico(esNumerico);
+
+        indices[indiceColumna] = indice;
         columnaIndexada[indiceColumna] = true;
 
         for (int i = 0; i < filas; i++) {
-            String valor = datos[i][indiceColumna];
-            if (valor != null) {
-                indices[indiceColumna].agregar(valor, i);
-            }
+            indices[indiceColumna].agregar(datos[i][indiceColumna], i);
         }
 
-        System.out.println("Índice ordenado creado exitosamente para: " + nombreColumna);
+        System.out.println("> Índice ordenado creado para: " + nombreColumna +
+                " (" + (esNumerico ? "Numérico" : "Texto") + ")");
     }
 
     private AlgoritmoOrdenacion obtenerAlgoritmoOrdenacion(String nombre) {
@@ -179,5 +186,9 @@ public class GestorCSV {
             return datos[fila][columna];
         }
         return null;
+    }
+
+    public String[] getCabeceras() {
+        return cabeceras.clone();
     }
 }

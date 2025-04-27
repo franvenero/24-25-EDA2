@@ -1,67 +1,45 @@
-
 public class IndiceOrdenado extends Indice {
     private boolean descendente;
+    private boolean esNumerico;
 
     public IndiceOrdenado(int capacidadMaxima, AlgoritmoOrdenacion algoritmoOrdenacion, boolean descendente) {
         super(capacidadMaxima, algoritmoOrdenacion);
         this.descendente = descendente;
+        this.esNumerico = true;
+    }
+
+    public void setEsNumerico(boolean esNumerico) {
+        this.esNumerico = esNumerico;
+    }
+
+    public boolean esNumerico() {
+        return esNumerico;
     }
 
     @Override
-    public void agregar(String valor, int posicion) {
-
-        super.agregar(valor, posicion);
-    }
-
-    @Override
-    protected void ordenar() {
-
-        super.ordenar();
-
-        if (descendente) {
-            invertirOrden();
+    public int[] buscar(String valor) {
+        if (esNumerico) {
+            try {
+                int numValor = Integer.parseInt(valor);
+                return buscarNumerico(numValor);
+            } catch (NumberFormatException e) {
+                return super.buscar(valor);
+            }
         }
+        return super.buscar(valor);
     }
 
-    private void invertirOrden() {
-        int inicio = 0;
-        int fin = getCantidadValores() - 1;
-
-        while (inicio < fin) {
-            intercambiarValores(inicio, fin);
-            inicio++;
-            fin--;
+    private int[] buscarNumerico(int valor) {
+        for (int i = 0; i < getCantidadValores(); i++) {
+            try {
+                int current = Integer.parseInt(getValor(i));
+                if (current == valor) {
+                    return buscarPorIndice(i);
+                }
+            } catch (NumberFormatException e) {
+                continue;
+            }
         }
-    }
-
-    private void intercambiarValores(int i, int j) {
-
-        String tempValor = getValor(i);
-        setValor(i, getValor(j));
-        setValor(j, tempValor);
-
-        int[] tempPosiciones = getPosiciones(i);
-        setPosiciones(i, getPosiciones(j));
-        setPosiciones(j, tempPosiciones);
-
-        int tempContador = getContador(i);
-        setContador(i, getContador(j));
-        setContador(j, tempContador);
-    }
-
-    public boolean esDescendente() {
-        return descendente;
-    }
-
-    public String getValorMinimo() {
-        if (getCantidadValores() == 0)
-            return null;
-        return descendente ? getValor(getCantidadValores() - 1) : getValor(0);
-    }
-
-    public String getValorMaximo() {
-        if (getCantidadValores() == 0)
-            return null;
-        return descendente ? getValor(0) : getValor(getCantidadValores() - 1);
+        return new int[0];
     }
 }

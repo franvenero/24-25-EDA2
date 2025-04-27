@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,92 +9,52 @@ public class BuscadorBinario {
     }
 
     public int[] buscarRango(String valorInicial, String valorFinal) {
-
-        if (indice.esDescendente()) {
-            String temp = valorInicial;
-            valorInicial = valorFinal;
-            valorFinal = temp;
-        }
-
-        int inicio = buscarIndiceInicial(valorInicial);
-        if (inicio == -1) {
-            return new int[0];
-        }
-
-        int fin = buscarIndiceFinal(valorFinal);
-        if (fin == -1 || fin < inicio) {
-            return new int[0];
-        }
-
-        List<Integer> posicionesList = new ArrayList<>();
-        for (int i = inicio; i <= fin; i++) {
-            int[] posicionesValor = indice.buscarPorIndice(i);
-            for (int pos : posicionesValor) {
-                posicionesList.add(pos);
+        if (indice.esNumerico()) {
+            try {
+                int init = Integer.parseInt(valorInicial);
+                int end = Integer.parseInt(valorFinal);
+                return buscarRangoNumerico(init, end);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Los valores de rango deben ser numéricos para esta columna");
+                return new int[0];
             }
         }
-
-        int[] posiciones = new int[posicionesList.size()];
-        for (int i = 0; i < posicionesList.size(); i++) {
-            posiciones[i] = posicionesList.get(i);
-        }
-
-        return posiciones;
+        return buscarRangoTexto(valorInicial, valorFinal);
     }
 
-    private int buscarIndiceInicial(String valor) {
-        int inicio = 0;
-        int fin = indice.getCantidadValores() - 1;
-        int resultado = -1;
+    private int[] buscarRangoNumerico(int valorInicial, int valorFinal) {
+        List<Integer> resultados = new ArrayList<>();
 
-        while (inicio <= fin) {
-            int medio = (inicio + fin) / 2;
-            int comparacion = indice.getValor(medio).compareTo(valor);
-
-            if (indice.esDescendente()) {
-                comparacion = -comparacion;
-            }
-
-            if (comparacion < 0) {
-                inicio = medio + 1;
-            } else {
-                fin = medio - 1;
-                resultado = medio;
+        for (int i = 0; i < indice.getCantidadValores(); i++) {
+            try {
+                int current = Integer.parseInt(indice.getValor(i));
+                if (current >= valorInicial && current <= valorFinal) {
+                    int[] posiciones = indice.buscarPorIndice(i);
+                    for (int pos : posiciones) {
+                        resultados.add(pos);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                continue;
             }
         }
 
-        if (resultado == -1) {
-            return 0;
-        }
-
-        return resultado;
+        return resultados.stream().mapToInt(i -> i).toArray();
     }
 
-    private int buscarIndiceFinal(String valor) {
-        int inicio = 0;
-        int fin = indice.getCantidadValores() - 1;
-        int resultado = -1;
+    private int[] buscarRangoTexto(String valorInicial, String valorFinal) {
+        List<Integer> resultados = new ArrayList<>();
 
-        while (inicio <= fin) {
-            int medio = (inicio + fin) / 2;
-            int comparacion = indice.getValor(medio).compareTo(valor);
-
-            if (indice.esDescendente()) {
-                comparacion = -comparacion;
-            }
-
-            if (comparacion <= 0) {
-                inicio = medio + 1;
-                resultado = medio;
-            } else {
-                fin = medio - 1;
+        for (int i = 0; i < indice.getCantidadValores(); i++) {
+            String current = indice.getValor(i);
+            if (current.compareTo(valorInicial) >= 0 && current.compareTo(valorFinal) <= 0) {
+                int[] posiciones = indice.buscarPorIndice(i);
+                for (int pos : posiciones) {
+                    resultados.add(pos);
+                }
             }
         }
 
-        if (resultado == -1) {
-            return indice.getCantidadValores() - 1;
-        }
-
-        return resultado;
+        return resultados.stream().mapToInt(i -> i).toArray();
     }
 }
