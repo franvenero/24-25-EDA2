@@ -8,11 +8,6 @@ public class FloodFill {
     private static int dimensionVertical;
     private static int dimensionHorizontal;
 
-    public static void main(String[] args) {
-        char[][] mapa = generarMapaEjemplo(DISEÑO_BASE);
-        ejecutarProcesoDeRelleno(mapa);
-    }
-
     private static String[] DISEÑO_BASE = {
             ".....................................................",
             ".....................................................",
@@ -35,6 +30,11 @@ public class FloodFill {
             ".....................................................",
             "....................................................."
     };
+    
+    public static void main(String[] args) {
+        char[][] mapa = generarMapaEjemplo(DISEÑO_BASE);
+        ejecutarProcesoDeRelleno(mapa);
+    }
 
     private static void ejecutarProcesoDeRelleno(char[][] mapa) {
 
