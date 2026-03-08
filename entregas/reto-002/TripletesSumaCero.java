@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class TripletesSumaCero {
     public static void main(String[] args) {
         int[] numeros = { -1, 0, 1, 2, -1, -4 };
@@ -11,22 +13,8 @@ public class TripletesSumaCero {
 
     public static int[][] encontrarTripletes(int[] nums) {
         int n = nums.length;
-
-        int count = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                for (int k = j + 1; k < n; k++) {
-                    if (nums[i] + nums[j] + nums[k] == 0) {
-                        if (!esDuplicado(nums[i], nums[j], nums[k], count, new int[10][3])) {
-                            count++;
-                        }
-                    }
-                }
-            }
-        }
-
-        int[][] resultados = new int[count][3];
-        count = 0;
+        
+        ArrayList<int[]> listaResultados = new ArrayList<>();
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
@@ -35,18 +23,15 @@ public class TripletesSumaCero {
                         int[] triplete = { nums[i], nums[j], nums[k] };
                         ordenarTriplete(triplete);
 
-                        if (!esDuplicado(triplete[0], triplete[1], triplete[2], count, resultados)) {
-                            resultados[count][0] = triplete[0];
-                            resultados[count][1] = triplete[1];
-                            resultados[count][2] = triplete[2];
-                            count++;
+                        if (!esDuplicado(triplete, listaResultados)) {
+                            listaResultados.add(triplete); 
                         }
                     }
                 }
             }
         }
 
-        return resultados;
+        return listaResultados.toArray(new int[0][]);
     }
 
     private static void ordenarTriplete(int[] triplete) {
@@ -61,9 +46,9 @@ public class TripletesSumaCero {
         }
     }
 
-    private static boolean esDuplicado(int a, int b, int c, int count, int[][] resultados) {
-        for (int i = 0; i < count; i++) {
-            if (resultados[i][0] == a && resultados[i][1] == b && resultados[i][2] == c) {
+    private static boolean esDuplicado(int[] candidato, ArrayList<int[]> resultados) {
+        for (int[] existente : resultados) {
+            if (existente[0] == candidato[0] && existente[1] == candidato[1] && existente[2] == candidato[2]) {
                 return true;
             }
         }
