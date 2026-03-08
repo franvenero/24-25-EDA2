@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class TripletesSumaCero {
     public static void main(String[] args) {
         int[] numeros = { -1, 0, 1, 2, -1, -4 };
@@ -11,13 +14,21 @@ public class TripletesSumaCero {
 
     public static int[][] encontrarTripletes(int[] nums) {
         int n = nums.length;
-
         int count = 0;
+        
+        Set<String> tripletesVistos = new HashSet<>();
+
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 for (int k = j + 1; k < n; k++) {
                     if (nums[i] + nums[j] + nums[k] == 0) {
-                        if (!esDuplicado(nums[i], nums[j], nums[k], count, new int[10][3])) {
+                        int[] tripleteTemp = { nums[i], nums[j], nums[k] };
+                        ordenarTriplete(tripleteTemp);
+                        
+                        String clave = tripleteTemp[0] + "," + tripleteTemp[1] + "," + tripleteTemp[2];
+                        
+                        if (!tripletesVistos.contains(clave)) {
+                            tripletesVistos.add(clave);
                             count++;
                         }
                     }
