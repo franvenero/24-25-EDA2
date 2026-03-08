@@ -12,21 +12,21 @@ public class TripletesSumaCero {
     public static int[][] encontrarTripletes(int[] nums) {
         int n = nums.length;
 
-        int count = 0;
+        int contador = 0;
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 for (int k = j + 1; k < n; k++) {
                     if (nums[i] + nums[j] + nums[k] == 0) {
-                        if (!esDuplicado(nums[i], nums[j], nums[k], count, new int[10][3])) {
-                            count++;
+                        if (!esDuplicado(nums[i], nums[j], nums[k], contador, new int[10][3])) {
+                            contador++;
                         }
                     }
                 }
             }
         }
 
-        int[][] resultados = new int[count][3];
-        count = 0;
+        int[][] resultados = new int[contador][3];
+        contador = 0;
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
@@ -35,11 +35,11 @@ public class TripletesSumaCero {
                         int[] triplete = { nums[i], nums[j], nums[k] };
                         ordenarTriplete(triplete);
 
-                        if (!esDuplicado(triplete[0], triplete[1], triplete[2], count, resultados)) {
-                            resultados[count][0] = triplete[0];
-                            resultados[count][1] = triplete[1];
-                            resultados[count][2] = triplete[2];
-                            count++;
+                        if (!esDuplicado(triplete[0], triplete[1], triplete[2], contador, resultados)) {
+                            resultados[contador][0] = triplete[0];
+                            resultados[contador][1] = triplete[1];
+                            resultados[contador][2] = triplete[2];
+                            contador++;
                         }
                     }
                 }
@@ -61,8 +61,8 @@ public class TripletesSumaCero {
         }
     }
 
-    private static boolean esDuplicado(int a, int b, int c, int count, int[][] resultados) {
-        for (int i = 0; i < count; i++) {
+    private static boolean esDuplicado(int a, int b, int c, int contador, int[][] resultados) {
+        for (int i = 0; i < contador; i++) {
             if (resultados[i][0] == a && resultados[i][1] == b && resultados[i][2] == c) {
                 return true;
             }
